@@ -9,6 +9,10 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     
     steps:
     - name: Checkout repository
@@ -30,16 +34,26 @@ jobs:
     - name: Build Flutter web
       run: flutter build web --release --verbose
       
+    - name: Add CNAME file
+      run: echo "www.ramchandrasolutions.com" > build/web/CNAME
+      
     - name: List build directory contents
       run: ls -la build/web/
       
     - name: Verify index.html exists
       run: test -f build/web/index.html && echo "index.html found" || echo "index.html missing"
       
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      if: github.ref == 'refs/heads/main'
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
       if: github.ref == 'refs/heads/main'
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build/web
-        cname: www.ramchandrasolutions.com
+        path: './build/web'
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+      if: github.ref == 'refs/heads/main'
