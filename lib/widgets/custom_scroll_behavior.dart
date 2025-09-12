@@ -15,3 +15,4 @@ class CustomScrollBehavior extends ScrollBehavior {
     return const BouncingScrollPhysics();
   }
 }
+

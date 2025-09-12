@@ -70,18 +70,60 @@ class FooterSection extends StatelessWidget {
                 
                 const SizedBox(height: 40),
                 
-                // Download button
+                // Download buttons
                 Center(
-                  child: _buildDownloadButton(
-                    icon: Icons.android,
-                    text: 'Download for Android',
-                    onTap: () async {
-                      final Uri playStoreUri = Uri.parse('https://play.google.com/store/apps/details?id=com.maindra.naamjhap');
-                      if (await canLaunchUrl(playStoreUri)) {
-                        await launchUrl(playStoreUri, mode: LaunchMode.externalApplication);
-                      }
-                    },
-                  ).animate().fadeIn(delay: 1.5.seconds, duration: 1.seconds).slideY(),
+                  child: screenWidth > 600 
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildDownloadButton(
+                            icon: Icons.android,
+                            text: 'Download for Android',
+                            onTap: () async {
+                              final Uri playStoreUri = Uri.parse('https://play.google.com/store/apps/details?id=com.maindra.naamjhap');
+                              if (await canLaunchUrl(playStoreUri)) {
+                                await launchUrl(playStoreUri, mode: LaunchMode.externalApplication);
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 20),
+                          _buildDownloadButton(
+                            icon: Icons.phone_iphone,
+                            text: 'Download for iOS',
+                            onTap: () async {
+                              final Uri appStoreUri = Uri.parse('https://apps.apple.com/in/app/naam-jap-mantra-mala-counter/id6752340785');
+                              if (await canLaunchUrl(appStoreUri)) {
+                                await launchUrl(appStoreUri, mode: LaunchMode.externalApplication);
+                              }
+                            },
+                          ),
+                        ],
+                      ).animate().fadeIn(delay: 1.5.seconds, duration: 1.seconds).slideY()
+                    : Column(
+                        children: [
+                          _buildDownloadButton(
+                            icon: Icons.android,
+                            text: 'Download for Android',
+                            onTap: () async {
+                              final Uri playStoreUri = Uri.parse('https://play.google.com/store/apps/details?id=com.maindra.naamjhap');
+                              if (await canLaunchUrl(playStoreUri)) {
+                                await launchUrl(playStoreUri, mode: LaunchMode.externalApplication);
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 15),
+                          _buildDownloadButton(
+                            icon: Icons.phone_iphone,
+                            text: 'Download for iOS',
+                            onTap: () async {
+                              final Uri appStoreUri = Uri.parse('https://apps.apple.com/in/app/naam-jap-mantra-mala-counter/id6752340785');
+                              if (await canLaunchUrl(appStoreUri)) {
+                                await launchUrl(appStoreUri, mode: LaunchMode.externalApplication);
+                              }
+                            },
+                          ),
+                        ],
+                      ).animate().fadeIn(delay: 1.5.seconds, duration: 1.seconds).slideY(),
                 ),
               ],
             ),

@@ -34,3 +34,4 @@ class AppColors {
   static const Color diyaFlame = Color(0xFFFFB74D);
   static const Color malaBeads = Color(0xFF8D6E63);
 }
+

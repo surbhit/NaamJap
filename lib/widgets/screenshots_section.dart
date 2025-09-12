@@ -329,3 +329,4 @@ class ScreenshotsSection extends StatelessWidget {
     ).animate().fadeIn(delay: delay, duration: 1.seconds).slideY();
   }
 }
+

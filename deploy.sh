@@ -28,3 +28,4 @@ echo "   1. Drag and drop the build/web folder to netlify.com"
 echo "   2. Or connect your GitHub repository"
 echo ""
 echo "✨ Om Namah Shivaya ✨"
+

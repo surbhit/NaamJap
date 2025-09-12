@@ -3,6 +3,7 @@ import '../constants/app_colors.dart';
 import '../widgets/hero_section.dart';
 import '../widgets/features_section.dart';
 import '../widgets/screenshots_section.dart';
+import '../widgets/events_count_section.dart';
 import '../widgets/contact_section.dart';
 import '../widgets/footer_section.dart';
 
@@ -28,6 +29,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 const HeroSection(),
                 const FeaturesSection(),
+                const EventsCountSection(),
                 const ScreenshotsSection(),
                 const ContactSection(),
                 const FooterSection(),
