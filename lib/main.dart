@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'screens/home_screen.dart';
+import 'screens/naamjap_screen.dart';
+import 'screens/privacy_policy_screen.dart';
 import 'widgets/custom_scroll_behavior.dart';
 import 'services/firebase_service.dart';
 
@@ -10,12 +13,26 @@ void main() async {
   runApp(const NaamJhapWebsite());
 }
 
+final GoRouter _router = GoRouter(
+  routes: [
+    GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+    GoRoute(
+      path: '/naamjap',
+      builder: (context, state) => const NaamJapScreen(),
+    ),
+    GoRoute(
+      path: '/privacy-policy',
+      builder: (context, state) => const PrivacyPolicyScreen(),
+    ),
+  ],
+);
+
 class NaamJhapWebsite extends StatelessWidget {
   const NaamJhapWebsite({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Naam Jhap - Your Sacred Journey to 8 Crore',
       debugShowCheckedModeBanner: false,
       scrollBehavior: CustomScrollBehavior(),
@@ -24,7 +41,7 @@ class NaamJhapWebsite extends StatelessWidget {
         textTheme: GoogleFonts.poppinsTextTheme(),
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
+      routerConfig: _router,
     );
   }
 }

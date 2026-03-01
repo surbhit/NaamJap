@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../constants/app_colors.dart';
 
@@ -9,17 +10,14 @@ class FooterSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 20),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            AppColors.darkGradientStart,
-            AppColors.darkGradientEnd,
-          ],
+          colors: [AppColors.darkGradientStart, AppColors.darkGradientEnd],
         ),
       ),
       child: Column(
@@ -43,21 +41,24 @@ class FooterSection extends StatelessWidget {
                   '🕉️',
                   style: const TextStyle(fontSize: 60),
                 ).animate().fadeIn(duration: 1.seconds).scale(),
-                
+
                 const SizedBox(height: 30),
-                
+
                 Text(
-                  'Start Your Sacred Journey Today',
-                  style: TextStyle(
-                    fontSize: screenWidth > 600 ? 32 : 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.whiteText,
-                  ),
-                  textAlign: TextAlign.center,
-                ).animate().fadeIn(delay: 0.5.seconds, duration: 1.seconds).slideY(),
-                
+                      'Start Your Sacred Journey Today',
+                      style: TextStyle(
+                        fontSize: screenWidth > 600 ? 32 : 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.whiteText,
+                      ),
+                      textAlign: TextAlign.center,
+                    )
+                    .animate()
+                    .fadeIn(delay: 0.5.seconds, duration: 1.seconds)
+                    .slideY(),
+
                 const SizedBox(height: 20),
-                
+
                 Text(
                   'Every chant brings you closer to your divine goal. With Naam Jhap, you can track your progress, stay motivated, and witness your spiritual growth with beautiful analytics and insights.',
                   style: TextStyle(
@@ -67,77 +68,109 @@ class FooterSection extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ).animate().fadeIn(delay: 1.seconds, duration: 1.seconds).slideY(),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Download buttons
                 Center(
-                  child: screenWidth > 600 
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildDownloadButton(
-                            icon: Icons.android,
-                            text: 'Download for Android',
-                            onTap: () async {
-                              final Uri playStoreUri = Uri.parse('https://play.google.com/store/apps/details?id=com.maindra.naamjhap');
-                              if (await canLaunchUrl(playStoreUri)) {
-                                await launchUrl(playStoreUri, mode: LaunchMode.externalApplication);
-                              }
-                            },
-                          ),
-                          const SizedBox(width: 20),
-                          _buildDownloadButton(
-                            icon: Icons.phone_iphone,
-                            text: 'Download for iOS',
-                            onTap: () async {
-                              final Uri appStoreUri = Uri.parse('https://apps.apple.com/in/app/naam-jap-mantra-mala-counter/id6752340785');
-                              if (await canLaunchUrl(appStoreUri)) {
-                                await launchUrl(appStoreUri, mode: LaunchMode.externalApplication);
-                              }
-                            },
-                          ),
-                        ],
-                      ).animate().fadeIn(delay: 1.5.seconds, duration: 1.seconds).slideY()
-                    : Column(
-                        children: [
-                          _buildDownloadButton(
-                            icon: Icons.android,
-                            text: 'Download for Android',
-                            onTap: () async {
-                              final Uri playStoreUri = Uri.parse('https://play.google.com/store/apps/details?id=com.maindra.naamjhap');
-                              if (await canLaunchUrl(playStoreUri)) {
-                                await launchUrl(playStoreUri, mode: LaunchMode.externalApplication);
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 15),
-                          _buildDownloadButton(
-                            icon: Icons.phone_iphone,
-                            text: 'Download for iOS',
-                            onTap: () async {
-                              final Uri appStoreUri = Uri.parse('https://apps.apple.com/in/app/naam-jap-mantra-mala-counter/id6752340785');
-                              if (await canLaunchUrl(appStoreUri)) {
-                                await launchUrl(appStoreUri, mode: LaunchMode.externalApplication);
-                              }
-                            },
-                          ),
-                        ],
-                      ).animate().fadeIn(delay: 1.5.seconds, duration: 1.seconds).slideY(),
+                  child:
+                      screenWidth > 600
+                          ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _buildDownloadButton(
+                                    icon: Icons.android,
+                                    text: 'Download for Android',
+                                    onTap: () async {
+                                      final Uri playStoreUri = Uri.parse(
+                                        'https://play.google.com/store/apps/details?id=com.maindra.naamjhap',
+                                      );
+                                      if (await canLaunchUrl(playStoreUri)) {
+                                        await launchUrl(
+                                          playStoreUri,
+                                          mode: LaunchMode.externalApplication,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                  const SizedBox(width: 20),
+                                  _buildDownloadButton(
+                                    icon: Icons.phone_iphone,
+                                    text: 'Download for iOS',
+                                    onTap: () async {
+                                      final Uri appStoreUri = Uri.parse(
+                                        'https://apps.apple.com/in/app/naam-jap-mantra-mala-counter/id6752340785',
+                                      );
+                                      if (await canLaunchUrl(appStoreUri)) {
+                                        await launchUrl(
+                                          appStoreUri,
+                                          mode: LaunchMode.externalApplication,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ],
+                              )
+                              .animate()
+                              .fadeIn(delay: 1.5.seconds, duration: 1.seconds)
+                              .slideY()
+                          : Column(
+                                children: [
+                                  _buildDownloadButton(
+                                    icon: Icons.android,
+                                    text: 'Download for Android',
+                                    onTap: () async {
+                                      final Uri playStoreUri = Uri.parse(
+                                        'https://play.google.com/store/apps/details?id=com.maindra.naamjhap',
+                                      );
+                                      if (await canLaunchUrl(playStoreUri)) {
+                                        await launchUrl(
+                                          playStoreUri,
+                                          mode: LaunchMode.externalApplication,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                  const SizedBox(height: 15),
+                                  _buildDownloadButton(
+                                    icon: Icons.phone_iphone,
+                                    text: 'Download for iOS',
+                                    onTap: () async {
+                                      final Uri appStoreUri = Uri.parse(
+                                        'https://apps.apple.com/in/app/naam-jap-mantra-mala-counter/id6752340785',
+                                      );
+                                      if (await canLaunchUrl(appStoreUri)) {
+                                        await launchUrl(
+                                          appStoreUri,
+                                          mode: LaunchMode.externalApplication,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ],
+                              )
+                              .animate()
+                              .fadeIn(delay: 1.5.seconds, duration: 1.seconds)
+                              .slideY(),
                 ),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 60),
-          
+
           // Features summary
           Container(
             constraints: const BoxConstraints(maxWidth: 1000),
             child: GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: screenWidth > 800 ? 4 : screenWidth > 600 ? 2 : 1,
+              crossAxisCount:
+                  screenWidth > 800
+                      ? 4
+                      : screenWidth > 600
+                      ? 2
+                      : 1,
               crossAxisSpacing: 20,
               mainAxisSpacing: 20,
               childAspectRatio: 1.5,
@@ -165,9 +198,9 @@ class FooterSection extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 60),
-          
+
           // Perfect for section
           Container(
             constraints: const BoxConstraints(maxWidth: 800),
@@ -187,45 +220,55 @@ class FooterSection extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ).animate().fadeIn(duration: 1.seconds).slideY(),
-                
+
                 const SizedBox(height: 30),
-                
+
                 Wrap(
                   spacing: 15,
                   runSpacing: 15,
                   alignment: WrapAlignment.center,
-                  children: [
-                    '8 crore naam jhap practitioners',
-                    'Japa and mantra meditation enthusiasts',
-                    'Spiritual seekers on devotional paths',
-                    'Yoga practitioners and meditation teachers',
-                    'Anyone tracking repetitive spiritual practices',
-                    'Devotees following traditional spiritual disciplines',
-                  ].map((text) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryOrange.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: AppColors.primaryOrange.withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Text(
-                      text,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.whiteText,
-                      ),
-                    ),
-                  )).toList(),
+                  children:
+                      [
+                            '8 crore naam jhap practitioners',
+                            'Japa and mantra meditation enthusiasts',
+                            'Spiritual seekers on devotional paths',
+                            'Yoga practitioners and meditation teachers',
+                            'Anyone tracking repetitive spiritual practices',
+                            'Devotees following traditional spiritual disciplines',
+                          ]
+                          .map(
+                            (text) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 15,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryOrange.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppColors.primaryOrange.withOpacity(
+                                    0.3,
+                                  ),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                text,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.whiteText,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
                 ).animate().fadeIn(delay: 0.5.seconds, duration: 1.seconds).slideY(),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 60),
-          
+
           // Final blessing
           Text(
             '✨ Om Namah Shivaya ✨',
@@ -237,9 +280,9 @@ class FooterSection extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ).animate().fadeIn(delay: 1.seconds, duration: 2.seconds).scale(),
-          
+
           const SizedBox(height: 20),
-          
+
           Text(
             'May your spiritual journey be blessed with peace, progress, and divine grace.',
             style: TextStyle(
@@ -249,9 +292,25 @@ class FooterSection extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ).animate().fadeIn(delay: 1.5.seconds, duration: 1.seconds).slideY(),
-          
+
           const SizedBox(height: 40),
-          
+
+          TextButton(
+            onPressed: () => context.go('/privacy-policy'),
+            child: Text(
+              'Privacy Policy',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.whiteText.withOpacity(0.85),
+                decoration: TextDecoration.underline,
+                decorationColor: AppColors.whiteText.withOpacity(0.85),
+              ),
+            ),
+          ).animate().fadeIn(delay: 1.8.seconds, duration: 1.seconds),
+
+          const SizedBox(height: 8),
+
           // Copyright
           Text(
             '© 2024 Naam Jhap. Made with ❤️ for spiritual seekers.',
@@ -291,11 +350,7 @@ class FooterSection extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: AppColors.whiteText,
-              size: 24,
-            ),
+            Icon(icon, color: AppColors.whiteText, size: 24),
             const SizedBox(width: 10),
             Text(
               text,
@@ -329,11 +384,7 @@ class FooterSection extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            color: AppColors.primaryOrange,
-            size: 30,
-          ),
+          Icon(icon, color: AppColors.primaryOrange, size: 30),
           const SizedBox(height: 10),
           Text(
             title,
