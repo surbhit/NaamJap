@@ -5,12 +5,86 @@ import '../constants/app_colors.dart';
 class ScreenshotsSection extends StatelessWidget {
   const ScreenshotsSection({super.key});
 
+  // Screenshot data with descriptions
+  final List<Map<String, dynamic>> screenshots = const [
+    {
+      'title': 'Choose Your Mantra',
+      'image': 'assets/images/screenshots/choose_mantra.png',
+      'description': [
+        'Select from a variety of sacred mantras',
+        'Includes Gan Ganapataye Namah, Ram Naam, Om Namah Shivaya',
+        'Each mantra comes with its meaning and significance',
+        'Easy selection interface',
+      ],
+    },
+    {
+      'title': 'My Mantras',
+      'image': 'assets/images/screenshots/my_mantras.png',
+      'description': [
+        'Manage all your mantras in one place',
+        'Track individual progress with chants and malas',
+        'View progress per mantra',
+        'Keep your spiritual practice organized',
+      ],
+    },
+    {
+      'title': 'Your Journey',
+      'image': 'assets/images/screenshots/your_journey.png',
+      'description': [
+        'Track your complete spiritual journey',
+        'View your meditation history',
+        'Monitor your progress over time',
+        'Celebrate milestones and achievements',
+      ],
+    },
+    {
+      'title': 'Mala Completion',
+      'image': 'assets/images/screenshots/mala_completion.png',
+      'description': [
+        'Complete full malas of 108 beads',
+        'Track your mala completion count',
+        'Celebrate each completed mala',
+        'Maintain your daily practice',
+      ],
+    },
+    {
+      'title': 'Spiritual Interface',
+      'image': 'assets/images/screenshots/spiritual_interface.png',
+      'description': [
+        'Beautiful and intuitive design',
+        'Peaceful and calming interface',
+        'Easy to navigate features',
+        'Designed for focused meditation',
+      ],
+    },
+    {
+      'title': 'Progress Counter',
+      'image': 'assets/images/screenshots/progress_counter.png',
+      'description': [
+        'Real-time progress tracking',
+        'Visual progress indicators',
+        'Set and achieve your goals',
+        'Monitor your daily chanting',
+      ],
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 1024;
+    
+    // Calculate image size based on screen width
+    // For one row, we need to fit all images
+    final imageHeight = isMobile ? 300.0 : isTablet ? 400.0 : 500.0;
+    final imageWidth = imageHeight * (368 / 800); // Maintain aspect ratio
     
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 20),
+      padding: EdgeInsets.symmetric(
+        vertical: isMobile ? 60 : 80,
+        horizontal: isMobile ? 16 : 24,
+      ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -27,7 +101,7 @@ class ScreenshotsSection extends StatelessWidget {
           Text(
             '📱 See Naam Jhap in Action',
             style: TextStyle(
-              fontSize: screenWidth > 600 ? 36 : 28,
+              fontSize: isMobile ? 28 : 36,
               fontWeight: FontWeight.bold,
               color: AppColors.whiteText,
             ),
@@ -39,294 +113,178 @@ class ScreenshotsSection extends StatelessWidget {
           Text(
             'Experience the beautiful interface designed for your spiritual journey',
             style: TextStyle(
-              fontSize: screenWidth > 600 ? 18 : 16,
+              fontSize: isMobile ? 16 : 18,
               color: AppColors.whiteText.withOpacity(0.8),
             ),
             textAlign: TextAlign.center,
           ).animate().fadeIn(delay: 0.5.seconds, duration: 1.seconds).slideY(),
           
-          const SizedBox(height: 60),
+          const SizedBox(height: 50),
           
-          // Screenshots grid
-          Container(
-            constraints: const BoxConstraints(maxWidth: 1200),
-            child: GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: screenWidth > 1000 ? 3 : screenWidth > 600 ? 2 : 1,
-              crossAxisSpacing: 30,
-              mainAxisSpacing: 30,
-              childAspectRatio: 0.6,
-              children: [
-                _buildScreenshotCard(
-                  title: 'Main Counter',
-                  description: 'Track your chants with beautiful mala visualization',
-                  features: ['One-tap counting', 'Mala progress', 'Real-time updates'],
-                  delay: 0.seconds,
-                ),
-                _buildScreenshotCard(
-                  title: 'Progress Tracker',
-                  description: 'Visualize your journey to 8 crore with detailed progress',
-                  features: ['Circular progress', 'ETA calculation', 'Milestone tracking'],
-                  delay: 0.2.seconds,
-                ),
-                _buildScreenshotCard(
-                  title: 'Mantra Management',
-                  description: 'Organize and track multiple mantras',
-                  features: ['Multiple mantras', 'Individual tracking', 'Easy management'],
-                  delay: 0.4.seconds,
-                ),
-                _buildScreenshotCard(
-                  title: 'Analytics Dashboard',
-                  description: 'Comprehensive insights into your practice',
-                  features: ['Daily statistics', 'Trend analysis', 'Progress history'],
-                  delay: 0.6.seconds,
-                ),
-                _buildScreenshotCard(
-                  title: 'Journey Overview',
-                  description: 'Complete view of your spiritual journey',
-                  features: ['Overall progress', 'Daily breakdown', 'Achievement tracking'],
-                  delay: 0.8.seconds,
-                ),
-                _buildScreenshotCard(
-                  title: 'Spiritual Design',
-                  description: 'Beautiful interface inspired by sacred traditions',
-                  features: ['Sacred colors', 'Intuitive design', 'Peaceful experience'],
-                  delay: 1.seconds,
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 60),
-          
-          // App preview mockup
-          Container(
-            constraints: const BoxConstraints(maxWidth: 300),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Phone frame
-                Container(
-                  width: 280,
-                  height: 560,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryText,
-                    borderRadius: BorderRadius.circular(40),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            AppColors.gradientStart,
-                            AppColors.gradientEnd,
-                          ],
-                        ),
-                      ),
-                      child: const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.self_improvement,
-                              size: 80,
-                              color: AppColors.primaryOrange,
-                            ),
-                            SizedBox(height: 20),
-                            Text(
-                              'Naam Jhap',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryText,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              'Your Sacred Journey',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: AppColors.secondaryText,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                
-                // Floating elements
-                Positioned(
-                  top: 50,
-                  right: 20,
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: const BoxDecoration(
-                      color: AppColors.omSymbol,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ).animate().fadeIn(delay: 1.5.seconds, duration: 1.seconds).scale(),
-                
-                Positioned(
-                  bottom: 80,
-                  left: 30,
-                  child: Container(
-                    width: 15,
-                    height: 15,
-                    decoration: const BoxDecoration(
-                      color: AppColors.diyaFlame,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ).animate().fadeIn(delay: 1.7.seconds, duration: 1.seconds).scale(),
-              ],
-            ),
-          ).animate().fadeIn(delay: 1.2.seconds, duration: 1.seconds).scale(),
+          // Images in one row with descriptions below
+          isMobile
+              ? _buildMobileLayout(imageWidth, imageHeight)
+              : _buildDesktopLayout(imageWidth, imageHeight),
         ],
       ),
     );
   }
 
+  Widget _buildMobileLayout(double imageWidth, double imageHeight) {
+    return Column(
+      children: screenshots.map((screenshot) {
+        final index = screenshots.indexOf(screenshot);
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 40),
+          child: _buildScreenshotCard(
+            screenshot: screenshot,
+            imageWidth: imageWidth,
+            imageHeight: imageHeight,
+            delay: (index * 0.1).seconds,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildDesktopLayout(double imageWidth, double imageHeight) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 24,
+      runSpacing: 40,
+      children: screenshots.asMap().entries.map((entry) {
+        final index = entry.key;
+        final screenshot = entry.value;
+        return _buildScreenshotCard(
+          screenshot: screenshot,
+          imageWidth: imageWidth,
+          imageHeight: imageHeight,
+          delay: (index * 0.1).seconds,
+        );
+      }).toList(),
+    );
+  }
+
   Widget _buildScreenshotCard({
-    required String title,
-    required String description,
-    required List<String> features,
+    required Map<String, dynamic> screenshot,
+    required double imageWidth,
+    required double imageHeight,
     required Duration delay,
   }) {
+    final title = screenshot['title'] as String;
+    final imagePath = screenshot['image'] as String;
+    final description = screenshot['description'] as List<String>;
+
     return Container(
-      padding: const EdgeInsets.all(25),
-      decoration: BoxDecoration(
-        color: AppColors.whiteText.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.whiteText.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
+      width: imageWidth + 40, // Add padding for card
+      constraints: const BoxConstraints(maxWidth: 300),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Mock phone screen
-          Expanded(
-            flex: 3,
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.gradientStart,
-                    AppColors.gradientEnd,
-                  ],
+          // Image container
+          Container(
+            width: imageWidth,
+            height: imageHeight,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 20,
+                  spreadRadius: 3,
+                  offset: const Offset(0, 8),
                 ),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primaryOrange,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.self_improvement,
-                        color: AppColors.whiteText,
-                        size: 20,
+                BoxShadow(
+                  color: AppColors.primaryOrange.withOpacity(0.2),
+                  blurRadius: 30,
+                  spreadRadius: 5,
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.asset(
+                imagePath,
+                width: imageWidth,
+                height: imageHeight,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.black,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.image_not_supported,
+                            size: 40,
+                            color: AppColors.whiteText.withOpacity(0.5),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.whiteText.withOpacity(0.7),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryText,
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ),
           
           const SizedBox(height: 20),
           
-          // Content
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.whiteText,
-                  ),
-                ),
-                
-                const SizedBox(height: 8),
-                
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.whiteText.withOpacity(0.8),
-                    height: 1.4,
-                  ),
-                ),
-                
-                const SizedBox(height: 12),
-                
-                // Features list
-                ...features.map((feature) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    children: [
-                      const Icon(
+          // Title
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.whiteText,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Description as bullet points
+          ...description.map((point) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 6, right: 8),
+                      child: Icon(
                         Icons.check_circle,
                         size: 16,
-                        color: AppColors.accentGreen,
+                        color: AppColors.primaryOrange,
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          feature,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.whiteText.withOpacity(0.7),
-                          ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        point,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.whiteText.withOpacity(0.9),
+                          height: 1.4,
                         ),
                       ),
-                    ],
-                  ),
-                )),
-              ],
-            ),
-          ),
+                    ),
+                  ],
+                ),
+              )),
         ],
       ),
-    ).animate().fadeIn(delay: delay, duration: 1.seconds).slideY();
+    ).animate()
+      .fadeIn(delay: delay, duration: 0.6.seconds)
+      .slideY(delay: delay, begin: 0.2, duration: 0.6.seconds);
   }
 }
-

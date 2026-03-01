@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import '../constants/app_colors.dart';
 
 class HeroSection extends StatelessWidget {
@@ -127,32 +128,120 @@ class HeroSection extends StatelessWidget {
                 
                 const SizedBox(height: 50),
                 
-                // CTA Button
+                // CTA Buttons
                 Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Scroll to features section
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOrange,
-                      foregroundColor: AppColors.whiteText,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 16,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      elevation: 8,
-                    ),
-                    child: const Text(
-                      'Start Your Journey',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ).animate().fadeIn(delay: 2.seconds, duration: 1.seconds).slideY(),
+                  child: screenWidth > 600
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              // Scroll to features section
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryOrange,
+                              foregroundColor: AppColors.whiteText,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 40,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              elevation: 8,
+                            ),
+                            child: const Text(
+                              'Start Your Journey',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          OutlinedButton(
+                            onPressed: () {
+                              context.go('/naamjap');
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.primaryOrange,
+                              side: const BorderSide(
+                                color: AppColors.primaryOrange,
+                                width: 2,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 40,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: const Text(
+                              'Learn More About App',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ).animate().fadeIn(delay: 2.seconds, duration: 1.seconds).slideY()
+                    : Column(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              // Scroll to features section
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryOrange,
+                              foregroundColor: AppColors.whiteText,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 40,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              elevation: 8,
+                            ),
+                            child: const Text(
+                              'Start Your Journey',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          OutlinedButton(
+                            onPressed: () {
+                              context.go('/naamjap');
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.primaryOrange,
+                              side: const BorderSide(
+                                color: AppColors.primaryOrange,
+                                width: 2,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 40,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: const Text(
+                              'Learn More About App',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ).animate().fadeIn(delay: 2.seconds, duration: 1.seconds).slideY(),
                 ),
               ],
             ),
