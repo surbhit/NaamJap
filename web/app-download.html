@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Download Naam Jap</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #fff3e0 0%, #ff8a65 100%);
+      color: #3e2723;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+    h1 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+    p { margin: 0 0 1.25rem; font-size: 0.95rem; line-height: 1.5; opacity: 0.9; }
+    a {
+      display: block;
+      margin: 0.5rem 0;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .ios {
+      background: #000;
+      color: #fff;
+    }
+    .android {
+      background: #01875f;
+      color: #fff;
+    }
+  </style>
+  <script>
+    (function () {
+      var ua = navigator.userAgent || navigator.vendor || '';
+      var iOS = /iPad|iPhone|iPod/.test(ua) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      var android = /android/i.test(ua);
+
+      var APP_STORE = 'https://apps.apple.com/in/app/naam-jap-mantra-mala-counter/id6752340785';
+      var PLAY_STORE = 'https://play.google.com/store/apps/details?id=com.maindra.naamjhap';
+
+      if (iOS) {
+        window.location.replace(APP_STORE);
+        return;
+      }
+      if (android) {
+        window.location.replace(PLAY_STORE);
+        return;
+      }
+      document.documentElement.classList.add('show-fallback');
+    })();
+  </script>
+</head>
+<body>
+  <noscript>
+    <div class="card">
+      <h1>Download Naam Jap</h1>
+      <p>Enable JavaScript for automatic store selection, or choose below:</p>
+      <a class="ios" href="https://apps.apple.com/in/app/naam-jap-mantra-mala-counter/id6752340785">App Store (iOS)</a>
+      <a class="android" href="https://play.google.com/store/apps/details?id=com.maindra.naamjhap">Google Play (Android)</a>
+    </div>
+  </noscript>
+  <div class="card" id="fallback" hidden>
+    <h1>Download Naam Jap</h1>
+    <p>Choose your store:</p>
+    <a class="ios" href="https://apps.apple.com/in/app/naam-jap-mantra-mala-counter/id6752340785">App Store (iOS)</a>
+    <a class="android" href="https://play.google.com/store/apps/details?id=com.maindra.naamjhap">Google Play (Android)</a>
+  </div>
+  <script>
+    if (document.documentElement.classList.contains('show-fallback')) {
+      document.getElementById('fallback').hidden = false;
+    }
+  </script>
+</body>
+</html>
