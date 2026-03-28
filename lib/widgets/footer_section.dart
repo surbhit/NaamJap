@@ -295,18 +295,45 @@ class FooterSection extends StatelessWidget {
 
           const SizedBox(height: 40),
 
-          TextButton(
-            onPressed: () => context.go('/privacy-policy'),
-            child: Text(
-              'Privacy Policy',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.whiteText.withOpacity(0.85),
-                decoration: TextDecoration.underline,
-                decorationColor: AppColors.whiteText.withOpacity(0.85),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              TextButton(
+                onPressed: () => context.go('/chanting-stats'),
+                child: Text(
+                  'Chanting stats',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.whiteText.withOpacity(0.85),
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColors.whiteText.withOpacity(0.85),
+                  ),
+                ),
               ),
-            ),
+              Text(
+                '·',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.whiteText.withOpacity(0.5),
+                ),
+              ),
+              TextButton(
+                onPressed: () => context.go('/privacy-policy'),
+                child: Text(
+                  'Privacy Policy',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.whiteText.withOpacity(0.85),
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColors.whiteText.withOpacity(0.85),
+                  ),
+                ),
+              ),
+            ],
           ).animate().fadeIn(delay: 1.8.seconds, duration: 1.seconds),
 
           const SizedBox(height: 8),

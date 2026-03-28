@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'screens/home_screen.dart';
 import 'screens/naamjap_screen.dart';
+import 'screens/chanting_stats_screen.dart';
 import 'screens/privacy_policy_screen.dart';
 import 'widgets/custom_scroll_behavior.dart';
 import 'services/firebase_service.dart';
@@ -23,6 +24,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/privacy-policy',
       builder: (context, state) => const PrivacyPolicyScreen(),
+    ),
+    GoRoute(
+      path: '/chanting-stats',
+      builder: (context, state) => const ChantingStatsScreen(),
     ),
   ],
 );
