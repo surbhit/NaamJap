@@ -1,16 +1,5 @@
 import 'package:flutter/material.dart';
 
-const chantGradient = LinearGradient(
-  begin: Alignment.topCenter,
-  end: Alignment.bottomCenter,
-  colors: [
-    Color(0xFFFEE3B4),
-    Color(0xFFFEA458),
-    Color(0xFFD56B21),
-  ],
-  stops: [0.0, 0.48, 1.0],
-);
-
 const chantBrown = Color(0xFF8C440F);
 const chantBrownSoft = Color(0xFF9A4E16);
 const chantCream = Color(0xFFFFF6EC);
@@ -24,9 +13,20 @@ class ChantScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFD56B21),
-      body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: chantGradient),
-        child: child,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/chant_background.jpg'),
+                fit: BoxFit.cover,
+                filterQuality: FilterQuality.medium,
+              ),
+            ),
+          ),
+          child,
+        ],
       ),
     );
   }

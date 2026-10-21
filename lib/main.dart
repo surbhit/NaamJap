@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'screens/home_screen.dart';
 import 'screens/naamjap_screen.dart';
@@ -18,14 +17,8 @@ void main() async {
 final GoRouter _router = GoRouter(
   routes: [
     GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
-    GoRoute(
-      path: '/naamjap',
-      builder: (context, state) => const ChantScreen(),
-    ),
-    GoRoute(
-      path: '/about',
-      builder: (context, state) => const NaamJapScreen(),
-    ),
+    GoRoute(path: '/naamjap', builder: (context, state) => const ChantScreen()),
+    GoRoute(path: '/about', builder: (context, state) => const NaamJapScreen()),
     GoRoute(
       path: '/privacy-policy',
       builder: (context, state) => const PrivacyPolicyScreen(),
@@ -47,8 +40,7 @@ class NaamJhapWebsite extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       scrollBehavior: CustomScrollBehavior(),
       theme: ThemeData(
-        primarySwatch: Colors.orange,
-        textTheme: GoogleFonts.poppinsTextTheme(),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFD56B21)),
         useMaterial3: true,
       ),
       routerConfig: _router,

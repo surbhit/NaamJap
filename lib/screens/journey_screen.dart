@@ -34,18 +34,17 @@ class _JourneyScreenState extends State<JourneyScreen> {
   @override
   Widget build(BuildContext context) {
     final store = widget.store;
-    final mantra = store.active;
-    final days = _activeDays(store, mantra.id);
-    final perDay = days == 0 ? 0.0 : mantra.totalChants / days;
-    final remaining = mantra.target - mantra.totalChants;
-    final eta = remaining <= 0 || perDay <= 0
-        ? null
-        : DateTime.now().add(Duration(days: (remaining / perDay).ceil()));
-
     final allChants = store.mantras.fold<int>(
       0,
       (sum, item) => sum + item.totalChants,
     );
+    final days = _activeDays(store);
+    final perDay = days == 0 ? 0.0 : allChants / days;
+    final remaining = store.target - allChants;
+    final eta =
+        remaining <= 0 || perDay <= 0
+            ? null
+            : DateTime.now().add(Duration(days: (remaining / perDay).ceil()));
 
     return ChantScaffold(
       child: SafeArea(
@@ -87,15 +86,6 @@ class _JourneyScreenState extends State<JourneyScreen> {
                         style: TextStyle(color: chantBrownSoft, height: 1.4),
                       ),
                     ),
-                  Text(
-                    mantra.name,
-                    style: const TextStyle(
-                      color: chantBrown,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
                   ChantCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,10 +101,7 @@ class _JourneyScreenState extends State<JourneyScreen> {
                         const SizedBox(height: 14),
                         Row(
                           children: [
-                            _stat(
-                              formatCount(mantra.totalChants),
-                              'Total\nChants',
-                            ),
+                            _stat(formatCount(allChants), 'Total\nChants'),
                             const SizedBox(width: 8),
                             _stat(perDay.toStringAsFixed(1), 'Per Day'),
                             const SizedBox(width: 8),
@@ -134,10 +121,10 @@ class _JourneyScreenState extends State<JourneyScreen> {
                           ),
                           child: Text(
                             remaining <= 0
-                                ? 'Target of ${compactTarget(mantra.target)} reached'
+                                ? 'Target of ${compactTarget(store.target)} reached'
                                 : eta == null
-                                ? 'ETA to ${compactTarget(mantra.target)}: keep chanting'
-                                : 'ETA to ${compactTarget(mantra.target)}: ${DateFormat('dd MMM yyyy').format(eta)}',
+                                ? 'ETA to ${compactTarget(store.target)}: keep chanting'
+                                : 'ETA to ${compactTarget(store.target)}: ${DateFormat('dd MMM yyyy').format(eta)}',
                             style: const TextStyle(
                               color: chantBrown,
                               fontWeight: FontWeight.w600,
@@ -157,7 +144,7 @@ class _JourneyScreenState extends State<JourneyScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  ..._dayCards(store, mantra.id),
+                  ..._dayCards(store),
                   const SizedBox(height: 8),
                   Text(
                     'All mantras: ${formatCount(allChants)} chants',
@@ -206,27 +193,23 @@ class _JourneyScreenState extends State<JourneyScreen> {
     );
   }
 
-  int _activeDays(ChantStore store, String mantraId) {
+  int _activeDays(ChantStore store) {
     final days = <String>{};
     for (final entry in store.history) {
-      if (entry.mantraId == mantraId && entry.chants > 0) {
-        days.add(_dayKey(entry.endedAt));
-      }
+      if (entry.chants > 0) days.add(_dayKey(entry.endedAt));
     }
-    if (store.sessionChants > 0 && store.activeMantraId == mantraId) {
-      days.add(_dayKey(DateTime.now()));
-    }
+    if (store.sessionChants > 0) days.add(_dayKey(DateTime.now()));
     return days.length;
   }
 
-  List<Widget> _dayCards(ChantStore store, String mantraId) {
+  List<Widget> _dayCards(ChantStore store) {
     final totals = <String, int>{};
     for (final entry in store.history) {
-      if (entry.mantraId != mantraId || entry.chants <= 0) continue;
+      if (entry.chants <= 0) continue;
       final key = _dayKey(entry.endedAt);
       totals[key] = (totals[key] ?? 0) + entry.chants;
     }
-    if (store.sessionChants > 0 && store.activeMantraId == mantraId) {
+    if (store.sessionChants > 0) {
       final key = _dayKey(DateTime.now());
       totals[key] = (totals[key] ?? 0) + store.sessionChants;
     }
@@ -239,50 +222,30 @@ class _JourneyScreenState extends State<JourneyScreen> {
       ];
     }
     final keys = totals.keys.toList()..sort((a, b) => b.compareTo(a));
-    final mantraName = store.active.name;
     return [
       for (final key in keys)
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: ChantCard(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Column(
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        key,
-                        style: const TextStyle(
-                          color: chantBrown,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                      ),
+                Expanded(
+                  child: Text(
+                    key,
+                    style: const TextStyle(
+                      color: chantBrown,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
                     ),
-                    Text(
-                      formatCount(totals[key]!),
-                      style: const TextStyle(
-                        color: chantBrown,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        mantraName,
-                        style: const TextStyle(color: chantBrownSoft),
-                      ),
-                    ),
-                    Text(
-                      formatCount(totals[key]!),
-                      style: const TextStyle(color: chantBrownSoft),
-                    ),
-                  ],
+                Text(
+                  formatCount(totals[key]!),
+                  style: const TextStyle(
+                    color: chantBrown,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
             ),

@@ -73,6 +73,7 @@ flutter:
     - assets/images/screenshots/
     - assets/images/chanting_export_background.png
     - assets/images/mala.png
+    - assets/images/chant_background.jpg
     - assets/data/iso3166_slim2.json
 
   # An image asset can refer to one or more resolution-specific "variants", see

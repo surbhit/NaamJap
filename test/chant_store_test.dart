@@ -20,11 +20,15 @@ void main() {
     store.dispose();
   });
 
-  test('starts on Gan Ganapataye Namah with an 11k target', () {
+  test('starts on Gan Ganapataye Namah with one shared 11k target', () {
     expect(store.active.name, 'Gan Ganapataye Namah');
-    expect(store.active.target, defaultMantraTarget);
+    expect(store.target, defaultMantraTarget);
     expect(store.sessionChants, 0);
     expect(store.active.malasCompleted, 0);
+
+    store.setTarget(80000000);
+    store.selectMantra('ram-naam');
+    expect(store.target, 80000000);
   });
 
   test('each tap counts a chant and 108 chants complete a mala', () async {
@@ -61,20 +65,25 @@ void main() {
     reloaded.dispose();
   });
 
-  test('switching mantras saves the open session on the previous name', () async {
-    store.chant();
-    store.chant();
-    store.chant();
-    store.selectMantra('ram-naam');
-    await store.flush();
+  test(
+    'switching mantras saves the open session on the previous name',
+    () async {
+      store.chant();
+      store.chant();
+      store.chant();
+      store.selectMantra('ram-naam');
+      await store.flush();
 
-    expect(store.active.name, 'Ram Naam');
-    expect(store.sessionChants, 0);
-    expect(store.history.single.mantraName, 'Gan Ganapataye Namah');
-    expect(store.history.single.chants, 3);
-    expect(
-      store.mantras.firstWhere((mantra) => mantra.id == 'gan-ganapataye').totalChants,
-      3,
-    );
-  });
+      expect(store.active.name, 'Ram Naam');
+      expect(store.sessionChants, 0);
+      expect(store.history.single.mantraName, 'Gan Ganapataye Namah');
+      expect(store.history.single.chants, 3);
+      expect(
+        store.mantras
+            .firstWhere((mantra) => mantra.id == 'gan-ganapataye')
+            .totalChants,
+        3,
+      );
+    },
+  );
 }

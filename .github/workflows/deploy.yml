@@ -51,25 +51,21 @@ jobs:
           event.waitUntil((async () => {
             const keys = await caches.keys();
             await Promise.all(keys.map((key) => caches.delete(key)));
-            await self.clients.claim();
             const windows = await self.clients.matchAll({type: 'window'});
-            await Promise.all(windows.map((client) => client.navigate(client.url)));
+            await Promise.all(windows.map((client) => {
+              const url = new URL(client.url);
+              url.searchParams.set('v', '__ASSET_VERSION__');
+              return client.navigate(url.toString());
+            }));
+            await self.registration.unregister();
           })());
-        });
-        self.addEventListener('fetch', (event) => {
-          const path = new URL(event.request.url).pathname;
-          const fresh = event.request.mode === 'navigate'
-            || path.endsWith('/main.dart.js')
-            || path.endsWith('/flutter_bootstrap.js')
-            || path.endsWith('/index.html');
-          if (!fresh) return;
-          event.respondWith(fetch(event.request, {cache: 'reload'}));
         });
         EOF
 
     - name: Cache-bust the Flutter entry files
       run: |
         VERSION="$(git rev-parse --short HEAD)"
+        sed -i "s|__ASSET_VERSION__|${VERSION}|g" build/web/flutter_service_worker.js
         sed -i "s|flutter_bootstrap.js|flutter_bootstrap.js?v=${VERSION}|g" build/web/index.html
         sed -i "s|mainJsPath\":\"main.dart.js\"|mainJsPath\":\"main.dart.js?v=${VERSION}\"|" build/web/flutter_bootstrap.js
         mkdir -p build/web/naamjap

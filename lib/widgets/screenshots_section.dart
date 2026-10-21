@@ -74,12 +74,17 @@ class ScreenshotsSection extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
-    
+
     // Calculate image size based on screen width
     // For one row, we need to fit all images
-    final imageHeight = isMobile ? 300.0 : isTablet ? 400.0 : 500.0;
+    final imageHeight =
+        isMobile
+            ? 300.0
+            : isTablet
+            ? 400.0
+            : 500.0;
     final imageWidth = imageHeight * (368 / 800); // Maintain aspect ratio
-    
+
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 60 : 80,
@@ -89,10 +94,7 @@ class ScreenshotsSection extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            AppColors.gradientEnd,
-            AppColors.darkGradientStart,
-          ],
+          colors: [AppColors.gradientEnd, AppColors.darkGradientStart],
         ),
       ),
       child: Column(
@@ -107,9 +109,9 @@ class ScreenshotsSection extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ).animate().fadeIn(duration: 1.seconds).slideY(),
-          
+
           const SizedBox(height: 20),
-          
+
           Text(
             'Experience the beautiful interface designed for your spiritual journey',
             style: TextStyle(
@@ -118,9 +120,9 @@ class ScreenshotsSection extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ).animate().fadeIn(delay: 0.5.seconds, duration: 1.seconds).slideY(),
-          
+
           const SizedBox(height: 50),
-          
+
           // Images in one row with descriptions below
           isMobile
               ? _buildMobileLayout(imageWidth, imageHeight)
@@ -132,18 +134,19 @@ class ScreenshotsSection extends StatelessWidget {
 
   Widget _buildMobileLayout(double imageWidth, double imageHeight) {
     return Column(
-      children: screenshots.map((screenshot) {
-        final index = screenshots.indexOf(screenshot);
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 40),
-          child: _buildScreenshotCard(
-            screenshot: screenshot,
-            imageWidth: imageWidth,
-            imageHeight: imageHeight,
-            delay: (index * 0.1).seconds,
-          ),
-        );
-      }).toList(),
+      children:
+          screenshots.map((screenshot) {
+            final index = screenshots.indexOf(screenshot);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 40),
+              child: _buildScreenshotCard(
+                screenshot: screenshot,
+                imageWidth: imageWidth,
+                imageHeight: imageHeight,
+                delay: (index * 0.1).seconds,
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -152,16 +155,17 @@ class ScreenshotsSection extends StatelessWidget {
       alignment: WrapAlignment.center,
       spacing: 24,
       runSpacing: 40,
-      children: screenshots.asMap().entries.map((entry) {
-        final index = entry.key;
-        final screenshot = entry.value;
-        return _buildScreenshotCard(
-          screenshot: screenshot,
-          imageWidth: imageWidth,
-          imageHeight: imageHeight,
-          delay: (index * 0.1).seconds,
-        );
-      }).toList(),
+      children:
+          screenshots.asMap().entries.map((entry) {
+            final index = entry.key;
+            final screenshot = entry.value;
+            return _buildScreenshotCard(
+              screenshot: screenshot,
+              imageWidth: imageWidth,
+              imageHeight: imageHeight,
+              delay: (index * 0.1).seconds,
+            );
+          }).toList(),
     );
   }
 
@@ -176,115 +180,120 @@ class ScreenshotsSection extends StatelessWidget {
     final description = screenshot['description'] as List<String>;
 
     return Container(
-      width: imageWidth + 40, // Add padding for card
-      constraints: const BoxConstraints(maxWidth: 300),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Image container
-          Container(
-            width: imageWidth,
-            height: imageHeight,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
-                  blurRadius: 20,
-                  spreadRadius: 3,
-                  offset: const Offset(0, 8),
-                ),
-                BoxShadow(
-                  color: AppColors.primaryOrange.withOpacity(0.2),
-                  blurRadius: 30,
-                  spreadRadius: 5,
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                imagePath,
+          width: imageWidth + 40, // Add padding for card
+          constraints: const BoxConstraints(maxWidth: 300),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Image container
+              Container(
                 width: imageWidth,
                 height: imageHeight,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.black,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.image_not_supported,
-                            size: 40,
-                            color: AppColors.whiteText.withOpacity(0.5),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            title,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.whiteText.withOpacity(0.7),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      blurRadius: 20,
+                      spreadRadius: 3,
+                      offset: const Offset(0, 8),
                     ),
-                  );
-                },
-              ),
-            ),
-          ),
-          
-          const SizedBox(height: 20),
-          
-          // Title
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.whiteText,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Description as bullet points
-          ...description.map((point) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 6, right: 8),
-                      child: Icon(
-                        Icons.check_circle,
-                        size: 16,
-                        color: AppColors.primaryOrange,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        point,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.whiteText.withOpacity(0.9),
-                          height: 1.4,
-                        ),
-                      ),
+                    BoxShadow(
+                      color: AppColors.primaryOrange.withOpacity(0.2),
+                      blurRadius: 30,
+                      spreadRadius: 5,
                     ),
                   ],
                 ),
-              )),
-        ],
-      ),
-    ).animate()
-      .fadeIn(delay: delay, duration: 0.6.seconds)
-      .slideY(delay: delay, begin: 0.2, duration: 0.6.seconds);
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    imagePath,
+                    width: imageWidth,
+                    height: imageHeight,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.medium,
+                    cacheHeight: (imageHeight * 2).round(),
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.black,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image_not_supported,
+                                size: 40,
+                                color: AppColors.whiteText.withOpacity(0.5),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                title,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.whiteText.withOpacity(0.7),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Title
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.whiteText,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Description as bullet points
+              ...description.map(
+                (point) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 6, right: 8),
+                        child: Icon(
+                          Icons.check_circle,
+                          size: 16,
+                          color: AppColors.primaryOrange,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          point,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.whiteText.withOpacity(0.9),
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )
+        .animate()
+        .fadeIn(delay: delay, duration: 0.6.seconds)
+        .slideY(delay: delay, begin: 0.2, duration: 0.6.seconds);
   }
 }

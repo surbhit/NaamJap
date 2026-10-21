@@ -31,6 +31,7 @@ class ChantStore extends ChangeNotifier {
 
   List<Mantra> mantras = defaultMantras();
   List<ChantHistoryEntry> history = [];
+  int target = defaultMantraTarget;
   String activeMantraId = 'gan-ganapataye';
   int sessionChants = 0;
   DateTime? sessionStartedAt;
@@ -145,36 +146,26 @@ class ChantStore extends ChangeNotifier {
     _enqueueSave();
   }
 
-  void addMantra({
-    required String name,
-    String detail = '',
-    int target = defaultMantraTarget,
-  }) {
+  void addMantra({required String name, String detail = ''}) {
     final trimmed = name.trim();
     if (trimmed.isEmpty) return;
     final mantra = Mantra(
       id: 'mantra-${DateTime.now().microsecondsSinceEpoch}',
       name: trimmed,
       detail: detail.trim(),
-      target: target < 1 ? defaultMantraTarget : target,
       createdAt: DateTime.now().millisecondsSinceEpoch,
     );
     mantras = [...mantras, mantra];
     selectMantra(mantra.id);
   }
 
-  void setTarget(String id, int target) {
-    if (target < 1) return;
-    for (final mantra in mantras) {
-      if (mantra.id == id) {
-        mantra.target = target;
-        _accountTarget = target;
-        _targetDirty = true;
-        notifyListeners();
-        _enqueueSave();
-        return;
-      }
-    }
+  void setTarget(int next) {
+    if (next < 1) return;
+    target = next;
+    _accountTarget = next;
+    _targetDirty = true;
+    notifyListeners();
+    _enqueueSave();
   }
 
   void removeMantra(String id) {
@@ -275,6 +266,7 @@ class ChantStore extends ChangeNotifier {
   Map<String, dynamic> _snapshot() {
     return {
       'activeMantraId': activeMantraId,
+      'target': target,
       'sessionChants': sessionChants,
       'sessionStartedAt': sessionStartedAt?.millisecondsSinceEpoch,
       'mantras': {for (final mantra in mantras) mantra.id: mantra.toJson()},
@@ -303,6 +295,7 @@ class ChantStore extends ChangeNotifier {
     mantras = defaultMantras();
     history = [];
     activeMantraId = mantras.first.id;
+    target = defaultMantraTarget;
     sessionChants = 0;
     sessionStartedAt = null;
   }
@@ -316,6 +309,8 @@ class ChantStore extends ChangeNotifier {
     }
     mantras = parsedMantras;
     history = _historyFrom(data['history']);
+    final savedTarget = asInt(data['target']);
+    target = savedTarget > 0 ? savedTarget : defaultMantraTarget;
     final requested = (data['activeMantraId'] ?? '').toString();
     activeMantraId =
         mantras.any((mantra) => mantra.id == requested)
@@ -383,6 +378,8 @@ class ChantStore extends ChangeNotifier {
     final userSnap = await userRef.get();
     final mantraSnap = await userRef.collection('mantras').get();
     if (!userSnap.exists && mantraSnap.docs.isEmpty) {
+      _accountTarget = target;
+      _targetDirty = true;
       await _pushRemote(profileUser: signedIn);
       await _writeLocal();
       return;
@@ -390,8 +387,11 @@ class ChantStore extends ChangeNotifier {
 
     final userData = userSnap.data() ?? {};
     final accountTarget = asInt(userData['user_target']);
-    _accountTarget = accountTarget > 0 ? accountTarget : null;
-    final goal = accountTarget > 0 ? accountTarget : defaultMantraTarget;
+    if (accountTarget > 0) {
+      target = accountTarget;
+      _accountTarget = accountTarget;
+      _targetDirty = false;
+    }
     final userDaily = _intMap(userData['history']);
 
     _syncedCounts.clear();
@@ -408,7 +408,6 @@ class ChantStore extends ChangeNotifier {
           id: doc.id,
           name: (data['name'] ?? 'Mantra').toString(),
           totalChants: count,
-          target: goal,
           createdAt: created > 0 ? created : doc.id.hashCode,
         ),
       );
@@ -445,7 +444,7 @@ class ChantStore extends ChangeNotifier {
         );
         continue;
       }
-      remoteMantras.add(guest.copy()..target = goal);
+      remoteMantras.add(guest.copy());
       _beadsById[guest.id] = beadsPerMala;
       keptGuestHistory.addAll(
         guestHistory.where((entry) => entry.mantraId == guest.id),
@@ -604,12 +603,12 @@ class ChantStore extends ChangeNotifier {
       }
       final totalCount = asInt(userData['total_count']) + addedChants;
       final totalMalas = asInt(userData['total_malas']) + addedMalas;
-      final target = _accountTarget ?? (userSnap.exists ? null : active.target);
+      final savedTarget = _accountTarget ?? (userSnap.exists ? null : target);
       tx.set(userRef, {
         'displayName': signedIn.displayName ?? '',
         'email': signedIn.email ?? '',
         'photoURL': signedIn.photoURL ?? '',
-        if (target != null) 'user_target': target,
+        if (savedTarget != null) 'user_target': savedTarget,
         'mantra_count': mantras.length,
         if (addedChants > 0) 'total_count': totalCount < 0 ? 0 : totalCount,
         if (addedMalas != 0) 'total_malas': totalMalas < 0 ? 0 : totalMalas,

@@ -9,7 +9,6 @@ import '../services/chant_store.dart';
 import '../widgets/chant_chrome.dart';
 import '../widgets/mala_counter.dart';
 import 'journey_screen.dart';
-import 'mantras_screen.dart';
 
 class ChantScreen extends StatefulWidget {
   const ChantScreen({super.key});
@@ -18,11 +17,8 @@ class ChantScreen extends StatefulWidget {
   State<ChantScreen> createState() => _ChantScreenState();
 }
 
-class _ChantScreenState extends State<ChantScreen>
-    with WidgetsBindingObserver {
+class _ChantScreenState extends State<ChantScreen> with WidgetsBindingObserver {
   final ChantStore _store = ChantStore();
-  Timer? _ticker;
-  double _pulse = 1;
 
   @override
   void initState() {
@@ -30,10 +26,6 @@ class _ChantScreenState extends State<ChantScreen>
     WidgetsBinding.instance.addObserver(this);
     _store.addListener(_onStore);
     _store.load();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted || _store.sessionChants == 0) return;
-      setState(() {});
-    });
   }
 
   void _onStore() {
@@ -51,7 +43,6 @@ class _ChantScreenState extends State<ChantScreen>
 
   @override
   void dispose() {
-    _ticker?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _store.removeListener(_onStore);
     _store.flush();
@@ -59,12 +50,9 @@ class _ChantScreenState extends State<ChantScreen>
     super.dispose();
   }
 
-  Future<void> _chant() async {
+  void _chant() {
     _store.chant();
     HapticFeedback.lightImpact();
-    setState(() => _pulse = 1.06);
-    await Future<void>.delayed(const Duration(milliseconds: 90));
-    if (mounted) setState(() => _pulse = 1);
   }
 
   Future<void> _done() async {
@@ -84,24 +72,33 @@ class _ChantScreenState extends State<ChantScreen>
   Future<void> _signIn() async {
     final result = await _store.signIn();
     if (!mounted || result.ok || result.message == null) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result.message!)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(result.message!)));
   }
 
-  void _openMantras() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => MantrasScreen(store: _store),
+  Future<void> _openMantras() {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFFFFF3E0),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(context).bottom,
+          ),
+          child: _MantraSheet(store: _store),
+        );
+      },
     );
   }
 
   void _openJourney() {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => JourneyScreen(store: _store),
-      ),
+      MaterialPageRoute<void>(builder: (_) => JourneyScreen(store: _store)),
     );
   }
 
@@ -128,21 +125,23 @@ class _ChantScreenState extends State<ChantScreen>
                 CircleAvatar(
                   radius: 28,
                   backgroundColor: chantBrown.withValues(alpha: 0.15),
-                  backgroundImage: user.photoURL == null
-                      ? null
-                      : NetworkImage(user.photoURL!),
-                  child: user.photoURL == null
-                      ? Text(
-                          (user.displayName ?? user.email ?? 'U')
-                              .substring(0, 1)
-                              .toUpperCase(),
-                          style: const TextStyle(
-                            color: chantBrown,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 22,
-                          ),
-                        )
-                      : null,
+                  backgroundImage:
+                      user.photoURL == null
+                          ? null
+                          : NetworkImage(user.photoURL!),
+                  child:
+                      user.photoURL == null
+                          ? Text(
+                            (user.displayName ?? user.email ?? 'U')
+                                .substring(0, 1)
+                                .toUpperCase(),
+                            style: const TextStyle(
+                              color: chantBrown,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 22,
+                            ),
+                          )
+                          : null,
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -162,10 +161,16 @@ class _ChantScreenState extends State<ChantScreen>
                   ),
                 const SizedBox(height: 12),
                 ListTile(
-                  leading: const Icon(Icons.insights_outlined, color: chantBrown),
+                  leading: const Icon(
+                    Icons.insights_outlined,
+                    color: chantBrown,
+                  ),
                   title: const Text(
                     'Your Journey',
-                    style: TextStyle(color: chantBrown, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: chantBrown,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -176,7 +181,10 @@ class _ChantScreenState extends State<ChantScreen>
                   leading: const Icon(Icons.logout, color: chantBrown),
                   title: const Text(
                     'Sign out',
-                    style: TextStyle(color: chantBrown, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: chantBrown,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   onTap: () async {
                     Navigator.pop(context);
@@ -267,15 +275,7 @@ class _ChantScreenState extends State<ChantScreen>
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            formatElapsed(_store.elapsed),
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: chantBrownSoft,
-              letterSpacing: 1.4,
-            ),
-          ),
+          _SessionClock(store: _store),
         ],
       ),
     );
@@ -285,7 +285,7 @@ class _ChantScreenState extends State<ChantScreen>
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _chant,
-        child: MalaCounter(count: _store.sessionChants, pulse: _pulse),
+        child: MalaCounter(count: _store.sessionChants),
       ),
     );
 
@@ -356,7 +356,7 @@ class _ChantScreenState extends State<ChantScreen>
       children: [
         ChantIconButton(
           icon: Icons.list_alt_rounded,
-          tooltip: 'Mantras and targets',
+          tooltip: 'Mantra and target',
           onPressed: _openMantras,
         ),
         const Spacer(),
@@ -410,20 +410,22 @@ class _ChantScreenState extends State<ChantScreen>
                 child: CircleAvatar(
                   radius: 18,
                   backgroundColor: chantBrown.withValues(alpha: 0.12),
-                  backgroundImage: user.photoURL == null
-                      ? null
-                      : NetworkImage(user.photoURL!),
-                  child: user.photoURL == null
-                      ? Text(
-                          (user.displayName ?? user.email ?? 'U')
-                              .substring(0, 1)
-                              .toUpperCase(),
-                          style: const TextStyle(
-                            color: chantBrown,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        )
-                      : null,
+                  backgroundImage:
+                      user.photoURL == null
+                          ? null
+                          : NetworkImage(user.photoURL!),
+                  child:
+                      user.photoURL == null
+                          ? Text(
+                            (user.displayName ?? user.email ?? 'U')
+                                .substring(0, 1)
+                                .toUpperCase(),
+                            style: const TextStyle(
+                              color: chantBrown,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                          : null,
                 ),
               ),
             ),
@@ -455,6 +457,261 @@ class _ChantScreenState extends State<ChantScreen>
               fontWeight: FontWeight.w600,
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SessionClock extends StatefulWidget {
+  const _SessionClock({required this.store});
+
+  final ChantStore store;
+
+  @override
+  State<_SessionClock> createState() => _SessionClockState();
+}
+
+class _SessionClockState extends State<_SessionClock> {
+  Timer? _ticker;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.store.addListener(_onStore);
+    _ensureTicker();
+  }
+
+  void _onStore() {
+    _ensureTicker();
+    if (mounted) setState(() {});
+  }
+
+  void _ensureTicker() {
+    final running = widget.store.sessionChants > 0;
+    if (running && _ticker == null) {
+      _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted) setState(() {});
+      });
+    } else if (!running && _ticker != null) {
+      _ticker?.cancel();
+      _ticker = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    widget.store.removeListener(_onStore);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      formatElapsed(widget.store.elapsed),
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+        color: chantBrownSoft,
+        letterSpacing: 1.4,
+      ),
+    );
+  }
+}
+
+class _MantraSheet extends StatefulWidget {
+  const _MantraSheet({required this.store});
+
+  final ChantStore store;
+
+  @override
+  State<_MantraSheet> createState() => _MantraSheetState();
+}
+
+class _MantraSheetState extends State<_MantraSheet> {
+  late final TextEditingController _target;
+  final TextEditingController _name = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _target = TextEditingController(text: '${widget.store.target}');
+    widget.store.addListener(_onStore);
+  }
+
+  void _onStore() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    widget.store.removeListener(_onStore);
+    _saveTarget();
+    _target.dispose();
+    _name.dispose();
+    super.dispose();
+  }
+
+  void _saveTarget() {
+    final next = int.tryParse(_target.text);
+    if (next == null || next < 1 || next == widget.store.target) return;
+    widget.store.setTarget(next);
+  }
+
+  void _addMantra() {
+    final name = _name.text.trim();
+    if (name.isEmpty) return;
+    widget.store.addMantra(name: name);
+    _name.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final store = widget.store;
+    final maxHeight = MediaQuery.sizeOf(context).height * 0.72;
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              width: 42,
+              height: 4,
+              decoration: BoxDecoration(
+                color: chantBrown.withValues(alpha: 0.25),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 14, 20, 4),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Mantra and target',
+                  style: TextStyle(
+                    color: chantBrown,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 12, 8),
+              child: Row(
+                children: [
+                  const Text(
+                    'Target',
+                    style: TextStyle(
+                      color: chantBrown,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _target,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      style: const TextStyle(
+                        color: chantBrown,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        hintText: 'Chants for all mantras',
+                      ),
+                      onSubmitted: (_) => _saveTarget(),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Save target',
+                    onPressed: _saveTarget,
+                    icon: const Icon(Icons.check_rounded, color: chantBrown),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Flexible(
+              child: ListView.separated(
+                shrinkWrap: true,
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                itemCount: store.mantras.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 4),
+                itemBuilder: (context, index) {
+                  final mantra = store.mantras[index];
+                  final selected = mantra.id == store.activeMantraId;
+                  return ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    selected: selected,
+                    selectedTileColor: Colors.white.withValues(alpha: 0.55),
+                    title: Text(
+                      mantra.name,
+                      style: const TextStyle(
+                        color: chantBrown,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${formatCount(mantra.totalChants)} chants',
+                      style: const TextStyle(color: chantBrownSoft),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          selected
+                              ? Icons.check_circle_rounded
+                              : Icons.circle_outlined,
+                          color: chantBrown,
+                        ),
+                        if (store.mantras.length > 1)
+                          IconButton(
+                            tooltip: 'Remove mantra',
+                            onPressed: () => store.removeMantra(mantra.id),
+                            icon: const Icon(
+                              Icons.close_rounded,
+                              color: chantBrownSoft,
+                            ),
+                          ),
+                      ],
+                    ),
+                    onTap: () => store.selectMantra(mantra.id),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 12, 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _name,
+                      textCapitalization: TextCapitalization.words,
+                      style: const TextStyle(color: chantBrown),
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        hintText: 'Add a mantra',
+                      ),
+                      onSubmitted: (_) => _addMantra(),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Add mantra',
+                    onPressed: _addMantra,
+                    icon: const Icon(Icons.add_rounded, color: chantBrown),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

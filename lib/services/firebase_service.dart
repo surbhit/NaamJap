@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/foundation.dart';
 
 import '../firebase_options.dart';
 
@@ -11,19 +10,14 @@ class FirebaseService {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    try {
-      _database = FirebaseDatabase.instance;
-    } catch (error) {
-      debugPrint('Realtime Database is not available: $error');
-    }
   }
 
   static FirebaseDatabase get database {
-    if (_database == null) {
+    if (Firebase.apps.isEmpty) {
       throw Exception(
         'Firebase not initialized. Call FirebaseService.initialize() first.',
       );
     }
-    return _database!;
+    return _database ??= FirebaseDatabase.instance;
   }
 }
