@@ -115,6 +115,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     bullets: [
                       'Google Analytics for Firebase',
                       'AdMob (if ads are enabled)',
+                      'Google AdSense, for the banner under the Done button on the website',
                       'We encourage you to review the privacy policies of these services.',
                     ],
                   ),

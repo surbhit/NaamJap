@@ -69,7 +69,7 @@ jobs:
         sed -i "s|flutter_bootstrap.js|flutter_bootstrap.js?v=${VERSION}|g" build/web/index.html
         sed -i "s|mainJsPath\":\"main.dart.js\"|mainJsPath\":\"main.dart.js?v=${VERSION}\"|" build/web/flutter_bootstrap.js
         mkdir -p build/web/naamjap
-        printf '%s\n' "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Naam Jap</title><link rel=\"canonical\" href=\"https://www.ramchandrasolutions.com/#/naamjap\"><meta http-equiv=\"refresh\" content=\"0;url=/?v=${VERSION}#/naamjap\"><script>location.replace('/?v=${VERSION}#/naamjap');</script></head><body></body></html>" > build/web/naamjap/index.html
+        printf '%s\n' "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Naam Jap</title><script async src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2593285195088254' crossorigin='anonymous'></script><link rel=\"canonical\" href=\"https://www.ramchandrasolutions.com/#/naamjap\"><meta http-equiv=\"refresh\" content=\"0;url=/?v=${VERSION}#/naamjap\"><script>location.replace('/?v=${VERSION}#/naamjap');</script></head><body></body></html>" > build/web/naamjap/index.html
       
     - name: List build directory contents
       run: ls -la build/web/

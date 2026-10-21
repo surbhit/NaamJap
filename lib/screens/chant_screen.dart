@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../models/chant_models.dart';
 import '../services/chant_store.dart';
+import '../widgets/chant_banner_ad.dart';
 import '../widgets/chant_chrome.dart';
 import '../widgets/mala_counter.dart';
 import 'journey_screen.dart';
@@ -321,9 +322,10 @@ class _ChantScreenState extends State<ChantScreen> with WidgetsBindingObserver {
     );
 
     final done = Padding(
-      padding: const EdgeInsets.fromLTRB(22, 0, 22, 18),
+      padding: const EdgeInsets.fromLTRB(22, 0, 22, 0),
       child: _doneButton(),
     );
+    const banner = ChantBannerAd();
 
     if (compact) {
       return SingleChildScrollView(
@@ -334,6 +336,7 @@ class _ChantScreenState extends State<ChantScreen> with WidgetsBindingObserver {
             stats,
             const SizedBox(height: 28),
             done,
+            banner,
           ],
         ),
       );
@@ -346,6 +349,7 @@ class _ChantScreenState extends State<ChantScreen> with WidgetsBindingObserver {
         stats,
         const SizedBox(height: 28),
         done,
+        banner,
       ],
     );
   }
