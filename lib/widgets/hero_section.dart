@@ -135,9 +135,7 @@ class HeroSection extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ElevatedButton(
-                            onPressed: () {
-                              // Scroll to features section
-                            },
+                            onPressed: () => context.go('/naamjap'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primaryOrange,
                               foregroundColor: AppColors.whiteText,
@@ -161,7 +159,7 @@ class HeroSection extends StatelessWidget {
                           const SizedBox(width: 20),
                           OutlinedButton(
                             onPressed: () {
-                              context.go('/naamjap');
+                              context.go('/about');
                             },
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.primaryOrange,
@@ -190,9 +188,7 @@ class HeroSection extends StatelessWidget {
                     : Column(
                         children: [
                           ElevatedButton(
-                            onPressed: () {
-                              // Scroll to features section
-                            },
+                            onPressed: () => context.go('/naamjap'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primaryOrange,
                               foregroundColor: AppColors.whiteText,
@@ -216,7 +212,7 @@ class HeroSection extends StatelessWidget {
                           const SizedBox(height: 15),
                           OutlinedButton(
                             onPressed: () {
-                              context.go('/naamjap');
+                              context.go('/about');
                             },
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.primaryOrange,

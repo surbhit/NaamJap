@@ -21,7 +21,7 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.29.3'
+        flutter-version: '3.47.4'
         channel: 'stable'
         cache: true
         
@@ -31,11 +31,18 @@ jobs:
     - name: Verify Flutter installation
       run: flutter doctor -v
       
+    # --pwa-strategy=none avoids aggressive service-worker caching so new deploys
+    # are visible without users clearing site data.
     - name: Build Flutter web
-      run: flutter build web --release --verbose
+      run: flutter build web --release --verbose --pwa-strategy=none
       
     - name: Add CNAME file
       run: echo "www.ramchandrasolutions.com" > build/web/CNAME
+
+    - name: Add clean URL for the chanting page
+      run: |
+        mkdir -p build/web/naamjap
+        printf '%s\n' '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Naam Jap</title><link rel="canonical" href="https://www.ramchandrasolutions.com/#/naamjap"><meta http-equiv="refresh" content="0;url=/#/naamjap"><script>location.replace("/#/naamjap");</script></head><body></body></html>' > build/web/naamjap/index.html
       
     - name: List build directory contents
       run: ls -la build/web/

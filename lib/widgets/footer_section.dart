@@ -301,6 +301,26 @@ class FooterSection extends StatelessWidget {
             runSpacing: 4,
             children: [
               TextButton(
+                onPressed: () => context.go('/naamjap'),
+                child: Text(
+                  'Chant',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.whiteText.withOpacity(0.85),
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColors.whiteText.withOpacity(0.85),
+                  ),
+                ),
+              ),
+              Text(
+                '·',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.whiteText.withOpacity(0.5),
+                ),
+              ),
+              TextButton(
                 onPressed: () => context.go('/chanting-stats'),
                 child: Text(
                   'Chanting stats',

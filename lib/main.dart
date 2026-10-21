@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'screens/home_screen.dart';
 import 'screens/naamjap_screen.dart';
+import 'screens/chant_screen.dart';
 import 'screens/chanting_stats_screen.dart';
 import 'screens/privacy_policy_screen.dart';
 import 'widgets/custom_scroll_behavior.dart';
@@ -19,6 +20,10 @@ final GoRouter _router = GoRouter(
     GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
     GoRoute(
       path: '/naamjap',
+      builder: (context, state) => const ChantScreen(),
+    ),
+    GoRoute(
+      path: '/about',
       builder: (context, state) => const NaamJapScreen(),
     ),
     GoRoute(

@@ -44,13 +44,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'your-web-api-key',
-    appId: 'your-web-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    authDomain: 'your-project-id.firebaseapp.com',
-    databaseURL: 'https://your-project-id-default-rtdb.firebaseio.com',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyBXwtXYRGe0tXchOl0vY4D6s-ZsrG9zMvA',
+    appId: '1:203512316854:web:7394416f1ef8dff981f717',
+    messagingSenderId: '203512316854',
+    projectId: 'naam-jhap',
+    authDomain: 'naam-jhap.firebaseapp.com',
+    storageBucket: 'naam-jhap.firebasestorage.app',
+    measurementId: 'G-2LFZTEBKQR',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
