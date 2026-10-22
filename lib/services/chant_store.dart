@@ -46,7 +46,10 @@ class ChantStore extends ChangeNotifier {
   int _unsyncedSeconds = 0;
   final Map<String, int> _syncedCounts = {};
   final Map<String, int> _beadsById = {};
+  final Map<String, int> _appliedGuestChants = {};
   final Set<String> _removedIds = {};
+  int _deferredGuestChants = 0;
+  DateTime? _deferredGuestStart;
 
   Mantra get active {
     for (final mantra in mantras) {
@@ -63,8 +66,28 @@ class ChantStore extends ChangeNotifier {
 
   bool get firebaseReady => Firebase.apps.isNotEmpty;
 
+  bool get _canUseFirebase =>
+      firebaseReady &&
+      DefaultFirebaseOptions.web.projectId != 'your-project-id';
+
+  bool _dropOpenSession = false;
+
   Future<void> load() async {
     await _loadFromPrefs(guestKey, useDefaultsWhenMissing: true);
+    _dropOpenSession = await _takeStuckSessionFix();
+    if (_dropOpenSession) {
+      sessionChants = 0;
+      sessionStartedAt = null;
+      await _clearGuestOpenSession();
+    }
+    // Auth restores a moment later. Don't paint a guest session that Done
+    // already saved on the signed-in profile.
+    if (_canUseFirebase && !_dropOpenSession) {
+      _deferredGuestChants = sessionChants;
+      _deferredGuestStart = sessionStartedAt;
+      sessionChants = 0;
+      sessionStartedAt = null;
+    }
     ready = true;
     notifyListeners();
     _listenAuth();
@@ -93,6 +116,13 @@ class ChantStore extends ChangeNotifier {
     user = next;
     if (next == null) {
       await _loadFromPrefs(guestKey, useDefaultsWhenMissing: true);
+      if (_deferredGuestChants > 0 && sessionChants == 0) {
+        sessionChants = _deferredGuestChants;
+        sessionStartedAt = _deferredGuestStart;
+      }
+      _deferredGuestChants = 0;
+      _deferredGuestStart = null;
+      _dropOpenSession = false;
       if (gen != _authGen) return;
       syncing = false;
       notifyListeners();
@@ -109,6 +139,7 @@ class ChantStore extends ChangeNotifier {
       await _loadFromPrefs(_userKey(next.uid), useDefaultsWhenMissing: false);
     }
     if (gen != _authGen) return;
+    _dropOpenSession = false;
     syncing = false;
     notifyListeners();
   }
@@ -129,8 +160,11 @@ class ChantStore extends ChangeNotifier {
     _recordHistory();
     sessionChants = 0;
     sessionStartedAt = null;
+    _deferredGuestChants = 0;
+    _deferredGuestStart = null;
     notifyListeners();
     await flush();
+    await _clearGuestOpenSession();
   }
 
   void selectMantra(String id) {
@@ -269,6 +303,7 @@ class ChantStore extends ChangeNotifier {
       'target': target,
       'sessionChants': sessionChants,
       'sessionStartedAt': sessionStartedAt?.millisecondsSinceEpoch,
+      'appliedGuestChants': _appliedGuestChants,
       'mantras': {for (final mantra in mantras) mantra.id: mantra.toJson()},
       'history': {for (final entry in history) entry.id: entry.toJson()},
     };
@@ -322,8 +357,15 @@ class ChantStore extends ChangeNotifier {
         sessionChants > 0 && started > 0
             ? DateTime.fromMillisecondsSinceEpoch(started)
             : null;
+    _appliedGuestChants
+      ..clear()
+      ..addAll(_intMap(data['appliedGuestChants']));
+    // Older snapshots kept a nested session. Honor it only when this
+    // snapshot never recorded the top-level fields.
     final session = asStringMap(data['session']);
-    if (session.isNotEmpty && sessionChants == 0) {
+    if (session.isNotEmpty &&
+        !data.containsKey('sessionChants') &&
+        sessionChants == 0) {
       sessionChants = asInt(session['chants']);
       final sessionStart = asInt(session['startedAt']);
       sessionStartedAt =
@@ -365,12 +407,99 @@ class ChantStore extends ChangeNotifier {
     return list;
   }
 
+  Future<bool> _takeStuckSessionFix() async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = 'naamjap.chant.clearedStuckSession';
+    if (prefs.getBool(key) == true) return false;
+    await prefs.setBool(key, true);
+    return true;
+  }
+
+  Future<Map<String, dynamic>?> _readSnapshot(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(key);
+    if (raw == null) return null;
+    try {
+      return asStringMap(jsonDecode(raw));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _applyResolvedSession({
+    required Map<String, dynamic>? accountSnapshot,
+    required int guestSessionChants,
+    required DateTime? guestSessionStart,
+    required bool savedGuestSession,
+  }) {
+    final accountChants =
+        accountSnapshot == null
+            ? null
+            : asInt(accountSnapshot['sessionChants']);
+    final accountStarted =
+        accountSnapshot == null
+            ? 0
+            : asInt(accountSnapshot['sessionStartedAt']);
+    if (accountChants != null &&
+        accountChants > 0 &&
+        accountStarted > 0 &&
+        !_dropOpenSession) {
+      sessionChants = accountChants;
+      sessionStartedAt = DateTime.fromMillisecondsSinceEpoch(accountStarted);
+    } else if (!savedGuestSession &&
+        guestSessionChants > 0 &&
+        !_dropOpenSession) {
+      sessionChants = guestSessionChants;
+      sessionStartedAt = guestSessionStart;
+    } else {
+      sessionChants = 0;
+      sessionStartedAt = null;
+    }
+  }
+
+  /// Done writes the signed-in profile only. The guest copy is what the next
+  /// visit loads first, so a finished session has to be cleared there too.
+  Future<void> _clearGuestOpenSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(guestKey);
+    if (raw == null) return;
+    final data = asStringMap(jsonDecode(raw));
+    data['sessionChants'] = 0;
+    data['sessionStartedAt'] = null;
+    final session = asStringMap(data['session']);
+    if (session.isNotEmpty) {
+      session['chants'] = 0;
+      session['startedAt'] = null;
+      data['session'] = session;
+    }
+    await prefs.setString(guestKey, jsonEncode(data));
+  }
+
   Future<void> _pullAndMerge(User signedIn) async {
     final guestMantras = mantras.map((mantra) => mantra.copy()).toList();
     final guestHistory = List<ChantHistoryEntry>.from(history);
-    final guestSessionChants = sessionChants;
-    final guestSessionStart = sessionStartedAt;
+    final guestSessionChants =
+        sessionChants > 0 ? sessionChants : _deferredGuestChants;
+    final guestSessionStart = sessionStartedAt ?? _deferredGuestStart;
     final guestActive = activeMantraId;
+    _deferredGuestChants = 0;
+    _deferredGuestStart = null;
+
+    final accountSnapshot = await _readSnapshot(_userKey(signedIn.uid));
+    final accountHistory = _historyFrom(accountSnapshot?['history']);
+    final savedGuestSession = guestSessionAlreadySaved(
+      chants: guestSessionChants,
+      startedAt: guestSessionStart,
+      saved: accountHistory,
+    );
+    if (accountSnapshot != null) {
+      final savedApplied = _intMap(accountSnapshot['appliedGuestChants']);
+      if (savedApplied.isNotEmpty) {
+        _appliedGuestChants
+          ..clear()
+          ..addAll(savedApplied);
+      }
+    }
 
     final userRef = FirebaseFirestore.instance
         .collection('users')
@@ -378,10 +507,17 @@ class ChantStore extends ChangeNotifier {
     final userSnap = await userRef.get();
     final mantraSnap = await userRef.collection('mantras').get();
     if (!userSnap.exists && mantraSnap.docs.isEmpty) {
+      _applyResolvedSession(
+        accountSnapshot: accountSnapshot,
+        guestSessionChants: guestSessionChants,
+        guestSessionStart: guestSessionStart,
+        savedGuestSession: savedGuestSession,
+      );
       _accountTarget = target;
       _targetDirty = true;
       await _pushRemote(profileUser: signedIn);
       await _writeLocal();
+      if (savedGuestSession) await _clearGuestOpenSession();
       return;
     }
 
@@ -417,8 +553,15 @@ class ChantStore extends ChangeNotifier {
     }
 
     if (remoteMantras.isEmpty) {
+      _applyResolvedSession(
+        accountSnapshot: accountSnapshot,
+        guestSessionChants: guestSessionChants,
+        guestSessionStart: guestSessionStart,
+        savedGuestSession: savedGuestSession,
+      );
       await _pushRemote(profileUser: signedIn);
       await _writeLocal();
+      if (savedGuestSession) await _clearGuestOpenSession();
       return;
     }
 
@@ -433,22 +576,37 @@ class ChantStore extends ChangeNotifier {
       remoteDaily[busiestId] = userDaily;
     }
 
+    final knownHistoryIds = accountHistory.map((entry) => entry.id).toSet();
     final keptGuestHistory = <ChantHistoryEntry>[];
     for (final guest in guestMantras) {
       if (guest.totalChants <= 0) continue;
+      final guestKeyName = guest.name.trim().toLowerCase();
+      final already = _appliedGuestChants[guestKeyName] ?? 0;
+      final extra =
+          savedGuestSession
+              ? 0
+              : (guest.totalChants - already).clamp(0, 1 << 30);
+      if (savedGuestSession || extra == 0) {
+        _appliedGuestChants[guestKeyName] = guest.totalChants;
+      }
+      final freshHistory = guestHistory.where(
+        (entry) =>
+            entry.mantraId == guest.id && !knownHistoryIds.contains(entry.id),
+      );
+      if (extra <= 0 && freshHistory.isEmpty) continue;
       final match = _findByName(remoteMantras, guest.name);
       if (match != null) {
-        match.totalChants += guest.totalChants;
-        keptGuestHistory.addAll(
-          guestHistory.where((entry) => entry.mantraId == guest.id),
-        );
+        match.totalChants += extra;
+        if (extra > 0) _appliedGuestChants[guestKeyName] = guest.totalChants;
+        keptGuestHistory.addAll(freshHistory);
         continue;
       }
-      remoteMantras.add(guest.copy());
+      final copy = guest.copy();
+      copy.totalChants = extra;
+      remoteMantras.add(copy);
       _beadsById[guest.id] = beadsPerMala;
-      keptGuestHistory.addAll(
-        guestHistory.where((entry) => entry.mantraId == guest.id),
-      );
+      if (extra > 0) _appliedGuestChants[guestKeyName] = guest.totalChants;
+      keptGuestHistory.addAll(freshHistory);
     }
 
     remoteMantras.sort((a, b) => a.createdAt.compareTo(b.createdAt));
@@ -456,8 +614,15 @@ class ChantStore extends ChangeNotifier {
     history = [..._dayEntries(remoteDaily), ...keptGuestHistory]
       ..sort((a, b) => a.endedAt.compareTo(b.endedAt));
 
-    sessionChants = guestSessionChants;
-    sessionStartedAt = guestSessionChants > 0 ? guestSessionStart : null;
+    _applyResolvedSession(
+      accountSnapshot: accountSnapshot,
+      guestSessionChants: guestSessionChants,
+      guestSessionStart: guestSessionStart,
+      savedGuestSession: savedGuestSession,
+    );
+    if (savedGuestSession) {
+      await _clearGuestOpenSession();
+    }
     final guestActiveMantra = _findById(guestMantras, guestActive);
     if (guestActiveMantra != null) {
       final match = _findByName(mantras, guestActiveMantra.name);
@@ -667,4 +832,21 @@ class ChantStore extends ChangeNotifier {
     _authSub?.cancel();
     super.dispose();
   }
+}
+
+/// True when [chants] that began at [startedAt] were already stored by Done.
+bool guestSessionAlreadySaved({
+  required int chants,
+  required DateTime? startedAt,
+  required Iterable<ChantHistoryEntry> saved,
+}) {
+  if (chants <= 0 || startedAt == null) return false;
+  final startedMs = startedAt.millisecondsSinceEpoch;
+  for (final entry in saved) {
+    if (entry.chants == chants &&
+        entry.startedAt.millisecondsSinceEpoch == startedMs) {
+      return true;
+    }
+  }
+  return false;
 }

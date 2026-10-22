@@ -65,6 +65,30 @@ void main() {
     reloaded.dispose();
   });
 
+  test('a finished session is not the same open session on the next visit', () {
+    final started = DateTime.fromMillisecondsSinceEpoch(1761000000000);
+    final saved = ChantHistoryEntry(
+      id: 'h-1',
+      mantraId: 'gan-ganapataye',
+      mantraName: 'Gan Ganapataye Namah',
+      chants: 43,
+      startedAt: started,
+      endedAt: started.add(const Duration(hours: 15, minutes: 20, seconds: 42)),
+    );
+    expect(
+      guestSessionAlreadySaved(chants: 43, startedAt: started, saved: [saved]),
+      isTrue,
+    );
+    expect(
+      guestSessionAlreadySaved(
+        chants: 10,
+        startedAt: started.add(const Duration(hours: 1)),
+        saved: [saved],
+      ),
+      isFalse,
+    );
+  });
+
   test(
     'switching mantras saves the open session on the previous name',
     () async {
